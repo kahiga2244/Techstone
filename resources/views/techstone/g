@@ -1,0 +1,42 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Mail;
+
+class MailController extends Controller
+{
+    public function create()
+    {
+        return view('email');
+    }
+
+    public function sendEmail(Request $request)
+    {
+        $request->validate([
+          'email' => 'required|email',
+          'phone_number' => 'required',
+          'business' => 'required',
+          'service' => 'required',
+          'name' => 'required',
+          'message' => 'required',
+        ]);
+
+        $data = [
+          'phone_number' => $request->phone_number,
+          'name' => $request->name,
+          'business' => $request->business,
+          'service' => $request-> service,
+          'email' => $request->email,
+          'message' => $request->message,
+        ];
+
+        Mail::send('email-template', $data, function($message) use ($data) {
+          $message->to($data['email'])
+          ->subject($data['subject']);
+        });
+
+        return back()->with(['message' => 'Email successfully sent!']);
+    }
+}
